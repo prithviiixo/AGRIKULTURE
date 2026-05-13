@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agri KULTURE — Farm to Future</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --soil:    #1e1208;
+  --bark:    #3d2008;
+  --moss:    #2d5020;
+  --leaf:    #4a7c30;
+  --sprout:  #6aaa40;
+  --lime:    #9fd060;
+  --harvest: #d4900a;
+  --wheat:   #f0d47a;
+  --cream:   #f8f4ea;
+  --mist:    #eef6e4;
+  --white:   #ffffff;
+  --danger:  #c0392b;
+  --warn:    #e67e22;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--soil);overflow-x:hidden;}
+
+/* ══════════════════════════════════════════
+   PAGE LOADER
+══════════════════════════════════════════ */
+#pageLoader{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--soil);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;
+  transition:opacity .5s,visibility .5s;
+}
+#pageLoader.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.loader-logo{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;color:var(--wheat);}
+.loader-logo em{color:var(--sprout);font-style:normal;}
+.loader-bar{width:200px;height:3px;background:rgba(106,170,64,.2);border-radius:2px;overflow:hidden;}
+.loader-fill{height:100%;background:linear-gradient(90deg,var(--sprout),var(--lime));border-radius:2px;animation:loadFill 1.4s ease forwards;}
+@keyframes loadFill{from{width:0}to{width:100%}}
+.loader-text{color:rgba(240,212,122,.5);font-size:.82rem;letter-spacing:2px;text-transform:uppercase;animation:pulse 1.2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ══════════════════════════════════════════
+   AUTH OVERLAY
+══════════════════════════════════════════ */
+#authOverlay{
+  position:fixed;inset:0;z-index:5000;
+  background:rgba(15,8,2,.92);
+  backdrop-filter:blur(18px);
+  display:flex;align-items:center;justify-content:center;
+  padding:1rem;
+  transition:opacity .4s,visibility .4s;
+}
+#authOverlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+
+.auth-panel{
+  background:rgba(30,18,8,.85);
+  border:1px solid rgba(106,170,64,.25);
+  border-radius:16px;
+  width:100%;max-width:480px;
+  padding:2.8rem 2.5rem;
+  position:relative;
+  box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 0 1px rgba(106,170,64,.1);
+  animation:authIn .5s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes authIn{from{opacity:0;transform:translateY(30px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.auth-logo{text-align:center;margin-bottom:2rem;}
+.auth-logo a{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--wheat);text-decoration:none;}
+.auth-logo a em{color:var(--sprout);font-style:normal;}
+.auth-logo p{color:rgba(240,212,122,.45);font-size:.8rem;letter-spacing:1.5px;text-transform:uppercase;margin-top:.4rem;}
+
+/* Landing auth screen */
+#authLanding{text-align:center;}
+.auth-landing-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--wheat);font-weight:700;margin-bottom:.5rem;}
+.auth-landing-sub{color:rgba(240,212,122,.5);font-size:.9rem;margin-bottom:2rem;}
+.auth-main-btns{display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.5rem;}
+.auth-btn-primary{
+  width:100%;padding:14px;border-radius:6px;border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:1rem;
+  background:var(--sprout);color:var(--soil);
+  transition:background .2s,transform .15s,box-shadow .2s;
+}
+.auth-btn-primary:hover{background:var(--lime);transform:translateY(-1px);box-shadow:0 6px 20px rgba(106,170,64,.35);}
+.auth-btn-secondary{
+  width:100%;padding:14px;border-radius:6px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:1rem;
+  background:transparent;color:var(--wheat);
+  border:1.5px solid rgba(240,212,122,.25);
+  transition:border-color .2s,background .2s;
+}
+.auth-btn-secondary:hover{border-color:var(--sprout);color:var(--sprout);background:rgba(106,170,64,.06);}
+.auth-btn-guest{
+  width:100%;padding:11px;border:none;background:transparent;
+  color:rgba(240,212,122,.4);font-family:'DM Sans',sans-serif;font-size:.88rem;
+  cursor:pointer;transition:color .2s;text-decoration:underline;
+}
+.auth-btn-guest:hover{color:rgba(240,212,122,.7);}
+
+/* Auth pages (login, register, forgot) */
+.auth-page{display:none;}
+.auth-page.active{display:block;}
+
+.auth-back{
+  background:none;border:none;color:rgba(240,212,122,.45);
+  font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;
+  display:flex;align-items:center;gap:.4rem;margin-bottom:1.5rem;
+  transition:color .2s;padding:0;
+}
+.auth-back:hover{color:var(--wheat);}
+
+.auth-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--wheat);margin-bottom:.4rem;}
+.auth-sub{color:rgba(240,212,122,.45);font-size:.88rem;margin-bottom:1.8rem;}
+
+/* Role tabs */
+.role-tabs{display:flex;gap:.5rem;margin-bottom:1.8rem;}
+.role-tab{
+  flex:1;padding:9px 6px;border-radius:5px;border:1.5px solid rgba(106,170,64,.2);
+  background:transparent;color:rgba(240,212,122,.5);cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-weight:600;font-size:.82rem;
+  transition:all .2s;text-align:center;
+}
+.role-tab.active{background:rgba(106,170,64,.15);border-color:var(--sprout);color:var(--lime);}
+.role-tab:hover:not(.active){border-color:rgba(106,170,64,.4);color:rgba(240,212,122,.7);}
+
+/* Form fields */
+.af{margin-bottom:1rem;}
+.af-label{display:block;color:rgba(240,212,122,.6);font-size:.73rem;font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:.4rem;}
+.af-wrap{position:relative;}
+.af-input{
+  width:100%;padding:11px 14px;
+  background:rgba(255,255,255,.06);
+  border:1.5px solid rgba(106,170,64,.2);
+  border-radius:5px;
+  color:var(--wheat);
+  font-family:'DM Sans',sans-serif;font-size:.93rem;
+  outline:none;transition:border-color .2s,background .2s;
+}
+.af-input:focus{border-color:var(--sprout);background:rgba(255,255,255,.09);}
+.af-input::placeholder{color:rgba(240,212,122,.25);}
+.af-input option{background:var(--soil);}
+.af-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(240,212,122,.4);cursor:pointer;font-size:1rem;padding:2px;}
+.af-eye:hover{color:var(--wheat);}
+
+.af-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+@media(max-width:480px){.af-row{grid-template-columns:1fr;}}
+
+.af-check{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;}
+.af-check input{width:15px;height:15px;accent-color:var(--sprout);cursor:pointer;}
+.af-check label{color:rgba(240,212,122,.55);font-size:.85rem;cursor:pointer;}
+.af-check a{color:var(--sprout);text-decoration:none;}
+.af-check a:hover{color:var(--lime);}
+
+.af-forgot{text-align:right;margin-bottom:1rem;}
+.af-forgot a{color:rgba(240,212,122,.4);font-size:.82rem;text-decoration:none;transition:color .2s;}
+.af-forgot a:hover{color:var(--sprout);}
+
+.af-submit{
+  width:100%;padding:13px;background:var(--sprout);color:var(--soil);
+  border:none;border-radius:5px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:.97rem;
+  transition:background .2s,transform .15s,box-shadow .2s;margin-top:.3rem;
+}
+.af-submit:hover{background:var(--lime);transform:translateY(-1px);box-shadow:0 6px 20px rgba(106,170,64,.3);}
+.af-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+.af-divider{display:flex;align-items:center;gap:.8rem;margin:1.2rem 0;}
+.af-divider::before,.af-divider::after{content:'';flex:1;height:1px;background:rgba(240,212,122,.1);}
+.af-divider span{color:rgba(240,212,122,.3);font-size:.78rem;white-space:nowrap;}
+
+.social-btns{display:flex;flex-direction:column;gap:.6rem;}
+.social-btn{
+  width:100%;padding:10px 14px;border-radius:5px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-weight:600;font-size:.88rem;
+  display:flex;align-items:center;justify-content:center;gap:.7rem;
+  background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);
+  color:var(--wheat);transition:background .2s,border-color .2s;
+}
+.social-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);}
+.social-btn svg{width:18px;height:18px;flex-shrink:0;}
+
+.af-switch{text-align:center;margin-top:1.3rem;color:rgba(240,212,122,.4);font-size:.85rem;}
+.af-switch a{color:var(--sprout);text-decoration:none;font-weight:600;cursor:pointer;}
+.af-switch a:hover{color:var(--lime);}
+
+/* Dynamic extra fields */
+.extra-fields{display:none;animation:fadeIn .3s ease both;}
+.extra-fields.show{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Role select cards */
+.role-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.2rem;}
+.role-card{
+  border:1.5px solid rgba(106,170,64,.2);border-radius:6px;padding:.9rem .5rem;
+  text-align:center;cursor:pointer;transition:all .2s;background:transparent;
+}
+.role-card:hover{border-color:rgba(106,170,64,.4);}
+.role-card.selected{background:rgba(106,170,64,.12);border-color:var(--sprout);}
+.role-card-ico{font-size:1.4rem;margin-bottom:.3rem;}
+.role-card-lbl{color:rgba(240,212,122,.6);font-size:.76rem;font-weight:600;}
+.role-card.selected .role-card-lbl{color:var(--lime);}
+
+/* OTP inputs */
+.otp-row{display:flex;gap:.6rem;justify-content:center;margin:1.2rem 0;}
+.otp-input{
+  width:48px;height:52px;text-align:center;
+  background:rgba(255,255,255,.06);border:1.5px solid rgba(106,170,64,.2);
+  border-radius:5px;color:var(--wheat);font-size:1.3rem;font-weight:700;
+  font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;
+}
+.otp-input:focus{border-color:var(--sprout);}
+
+/* Auth error/success messages */
+.af-msg{padding:9px 13px;border-radius:5px;font-size:.84rem;font-weight:600;margin-bottom:1rem;display:none;}
+.af-msg.error{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);color:#e74c3c;display:block;}
+.af-msg.success{background:rgba(39,174,96,.12);border:1px solid rgba(39,174,96,.4);color:#2ecc71;display:block;}
+
+/* Auth success animation */
+.auth-success-screen{
+  text-align:center;padding:2rem 0;display:none;
+}
+.auth-success-screen.show{display:block;}
+.success-checkmark{
+  width:72px;height:72px;border-radius:50%;background:rgba(106,170,64,.15);
+  border:3px solid var(--sprout);display:flex;align-items:center;justify-content:center;
+  font-size:2rem;margin:0 auto 1.2rem;
+  animation:successPop .5s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes successPop{from{scale:.3;opacity:0}to{scale:1;opacity:1}}
+.success-name{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--wheat);margin-bottom:.4rem;}
+.success-msg{color:rgba(240,212,122,.5);font-size:.9rem;}
+
+/* ══════════════════════════════════════════
+   AUTH REQUIRED MODAL (for cart / sell)
+══════════════════════════════════════════ */
+#authRequired{
+  position:fixed;inset:0;z-index:4000;
+  background:rgba(10,5,2,.8);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;padding:1rem;
+  display:none;
+}
+.auth-req-box{
+  background:rgba(30,18,8,.95);border:1px solid rgba(106,170,64,.3);
+  border-radius:12px;padding:2.5rem;max-width:400px;width:100%;text-align:center;
+  animation:authIn .4s ease both;
+}
+.auth-req-ico{font-size:3rem;margin-bottom:1rem;}
+.auth-req-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--wheat);margin-bottom:.5rem;}
+.auth-req-msg{color:rgba(240,212,122,.5);font-size:.88rem;margin-bottom:1.5rem;line-height:1.6;}
+.auth-req-btns{display:flex;gap:.8rem;justify-content:center;}
+.auth-req-close{background:none;border:1px solid rgba(240,212,122,.2);color:rgba(240,212,122,.45);padding:9px 20px;border-radius:4px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.88rem;transition:all .2s;}
+.auth-req-close:hover{border-color:rgba(240,212,122,.4);color:var(--wheat);}
+
+/* ══════════════════════════════════════════
+   NAV
+══════════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:rgba(30,18,8,.97);backdrop-filter:blur(12px);
+  height:64px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 5vw;border-bottom:2px solid var(--sprout);
+}
+.logo{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:900;color:var(--wheat);letter-spacing:-.5px;text-decoration:none;}
+.logo em{color:var(--sprout);font-style:normal;}
+.nav-links{display:flex;gap:1.8rem;list-style:none;align-items:center;}
+.nav-links a{color:rgba(240,212,122,.75);text-decoration:none;font-size:.88rem;font-weight:500;letter-spacing:.4px;text-transform:uppercase;transition:color .2s;}
+.nav-links a:hover{color:var(--lime);}
+.nav-cta{background:var(--sprout)!important;color:var(--soil)!important;padding:8px 20px;border-radius:4px;font-weight:700!important;}
+.nav-cta:hover{background:var(--harvest)!important;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:24px;height:2px;background:var(--wheat);border-radius:2px;transition:.3s;}
+
+/* Nav user section */
+.nav-user{display:flex;align-items:center;gap:1rem;}
+.nav-username{color:var(--lime);font-weight:600;font-size:.88rem;display:flex;align-items:center;gap:.4rem;}
+.nav-logout{background:none;border:1px solid rgba(240,212,122,.2);color:rgba(240,212,122,.5);padding:5px 12px;border-radius:3px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;transition:all .2s;}
+.nav-logout:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ══════════════════════════════════════════
+   HERO
+══════════════════════════════════════════ */
+.hero{
+  min-height:100vh;padding-top:64px;
+  background:var(--soil);
+  display:flex;align-items:center;
+  position:relative;overflow:hidden;
+}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;}
+.orb1{width:520px;height:520px;background:rgba(106,170,64,.18);top:-80px;right:-100px;}
+.orb2{width:380px;height:380px;background:rgba(212,144,10,.12);bottom:-60px;left:5%;}
+.orb3{width:250px;height:250px;background:rgba(106,170,64,.08);top:40%;left:40%;}
+.particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.particle{position:absolute;border-radius:50%;animation:drift linear infinite;opacity:0;}
+@keyframes drift{
+  0%{transform:translateY(110vh) rotate(0deg);opacity:0;}
+  5%{opacity:.35;}90%{opacity:.35;}
+  100%{transform:translateY(-10vh) rotate(720deg);opacity:0;}
+}
+.hero-inner{
+  position:relative;z-index:2;
+  max-width:1260px;margin:0 auto;padding:0 5vw;
+  display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;
+}
+.hero-left{animation:slideUp .9s ease both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(44px);}to{opacity:1;transform:translateY(0);}}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(106,170,64,.15);border:1px solid rgba(106,170,64,.4);
+  color:var(--lime);font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;
+  padding:6px 14px;border-radius:2px;margin-bottom:1.5rem;
+}
+.hero-h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.8rem,5.5vw,5rem);font-weight:900;line-height:1.05;
+  color:var(--wheat);margin-bottom:1.4rem;
+}
+.hero-h1 .green{color:var(--sprout);display:block;}
+.hero-p{color:rgba(240,212,122,.65);font-size:1.05rem;line-height:1.75;max-width:460px;margin-bottom:2.4rem;}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;}
+.btn{
+  display:inline-block;padding:13px 30px;border-radius:4px;font-family:'DM Sans',sans-serif;
+  font-weight:700;font-size:.95rem;text-decoration:none;border:none;cursor:pointer;
+  transition:background .2s,transform .15s,box-shadow .2s;
+}
+.btn-green{background:var(--sprout);color:var(--soil);}
+.btn-green:hover{background:var(--lime);transform:translateY(-2px);box-shadow:0 8px 24px rgba(106,170,64,.35);}
+.btn-ghost{background:transparent;color:var(--wheat);border:1px solid rgba(240,212,122,.3);}
+.btn-ghost:hover{border-color:var(--sprout);color:var(--sprout);}
+.hero-cards{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;animation:slideUp .9s .25s ease both;}
+.hcard{
+  background:rgba(255,255,255,.05);border:1px solid rgba(106,170,64,.25);
+  border-radius:10px;padding:1.6rem;
+  transition:border-color .25s,background .25s,transform .2s;
+}
+.hcard:hover{border-color:var(--sprout);background:rgba(106,170,64,.1);transform:translateY(-3px);}
+.hcard-icon{font-size:2rem;margin-bottom:.6rem;}
+.hcard-num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--harvest);line-height:1;}
+.hcard-lbl{color:rgba(240,212,122,.55);font-size:.8rem;margin-top:.3rem;}
+
+/* ══════════════════════════════════════════
+   SECTION BASE
+══════════════════════════════════════════ */
+.section{padding:6rem 5vw;}
+.inner{max-width:1260px;margin:0 auto;}
+.stag{display:inline-block;font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--leaf);border-left:3px solid var(--sprout);padding-left:10px;margin-bottom:.8rem;}
+.sh{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,3.5vw,2.8rem);font-weight:700;color:var(--soil);line-height:1.2;margin-bottom:.8rem;}
+.sp{color:var(--bark);font-size:1rem;line-height:1.65;max-width:580px;margin-bottom:2.8rem;}
+
+/* ══════════════════════════════════════════
+   MARKETPLACE / PRODUCT CARDS
+══════════════════════════════════════════ */
+.market-bg{background:var(--mist);}
+.tabs{display:flex;overflow-x:auto;gap:0;margin-bottom:2rem;border:1px solid rgba(74,124,48,.3);border-radius:6px;width:fit-content;max-width:100%;}
+.tab{padding:11px 26px;background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.88rem;color:var(--bark);white-space:nowrap;transition:background .2s,color .2s;}
+.tab.on{background:var(--leaf);color:#fff;}
+.tab:hover:not(.on){background:rgba(74,124,48,.1);}
+.mfilters{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;align-items:center;}
+.finput{flex:1;min-width:200px;padding:10px 15px;border:1px solid rgba(74,124,48,.3);border-radius:4px;background:#fff;font-family:'DM Sans',sans-serif;font-size:.93rem;color:var(--soil);outline:none;}
+.finput:focus{border-color:var(--leaf);}
+.fsel{padding:10px 14px;border:1px solid rgba(74,124,48,.3);border-radius:4px;background:#fff;font-family:'DM Sans',sans-serif;font-size:.93rem;color:var(--soil);outline:none;cursor:pointer;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.4rem;}
+
+/* ── Enhanced Product Card ── */
+.pcard{
+  background:#fff;border-radius:12px;border:1px solid rgba(74,124,48,.12);
+  overflow:hidden;transition:transform .25s,box-shadow .25s;cursor:default;
+  position:relative;display:flex;flex-direction:column;
+}
+.pcard:hover{transform:translateY(-6px);box-shadow:0 16px 44px rgba(30,18,8,.14);}
+.pimg{
+  height:170px;overflow:hidden;position:relative;
+  background:#f0f0e8;display:flex;align-items:center;justify-content:center;
+}
+.pimg img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .4s ease;display:block;
+}
+.pimg-emoji{font-size:4.5rem;line-height:1;} /* fallback */
+.pcard:hover .pimg img{transform:scale(1.07);}
+.pbadge{position:absolute;top:9px;right:9px;font-size:.66rem;font-weight:700;padding:3px 9px;border-radius:2px;text-transform:uppercase;letter-spacing:.4px;color:#fff;z-index:1;}
+.pbadge-bestseller{position:absolute;top:9px;left:9px;background:var(--harvest);color:var(--soil);font-size:.64rem;font-weight:800;padding:3px 8px;border-radius:2px;text-transform:uppercase;letter-spacing:.5px;z-index:1;}
+.pwishlist{
+  position:absolute;top:9px;right:9px;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.88);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;
+  transition:background .2s,transform .15s;z-index:2;
+  box-shadow:0 2px 6px rgba(0,0,0,.12);
+}
+.pwishlist:hover{background:#fff;transform:scale(1.1);}
+.pwishlist.active{background:#ffe0e0;}
+.pinfo{padding:1.1rem;flex:1;display:flex;flex-direction:column;}
+.pname{font-weight:700;font-size:.97rem;color:var(--soil);margin-bottom:.2rem;}
+.pstars{display:flex;align-items:center;gap:.25rem;margin-bottom:.3rem;}
+.pstar{color:#ddd;font-size:.75rem;}
+.pstar.filled{color:var(--harvest);}
+.prating-txt{font-size:.74rem;color:var(--bark);margin-left:.1rem;}
+.pmeta{font-size:.8rem;color:var(--bark);margin-bottom:.5rem;}
+.pmeta span{margin-right:.7rem;}
+.pstock{font-size:.75rem;font-weight:600;margin-bottom:.7rem;}
+.pstock.in{color:#27ae60;}
+.pstock.low{color:var(--warn);}
+.pfoot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
+.pprice{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--leaf);}
+.pprice small{font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--bark);font-weight:400;}
+.pcard-btns{display:flex;gap:.4rem;}
+.abtn{
+  background:var(--leaf);color:#fff;border:none;border-radius:4px;
+  padding:7px 11px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-weight:700;font-size:.78rem;transition:background .2s;white-space:nowrap;
+}
+.abtn:hover{background:var(--moss);}
+.buynow-btn{
+  background:var(--harvest);color:#fff;border:none;border-radius:4px;
+  padding:7px 11px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-weight:700;font-size:.78rem;transition:background .2s;white-space:nowrap;
+}
+.buynow-btn:hover{background:#b8790a;}
+.quickview-btn{
+  position:absolute;bottom:60px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:rgba(30,18,8,.85);color:var(--wheat);border:none;border-radius:4px;
+  padding:7px 14px;cursor:pointer;font-family:'DM Sans',sans-serif;
+  font-weight:600;font-size:.78rem;white-space:nowrap;
+  opacity:0;transition:opacity .2s,transform .2s;z-index:3;
+  backdrop-filter:blur(4px);
+}
+.pcard:hover .quickview-btn{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ══════════════════════════════════════════
+   SELL
+══════════════════════════════════════════ */
+.sell-bg{background:var(--soil);}
+.sell-bg .sh{color:var(--wheat);}
+.sell-bg .sp{color:rgba(240,212,122,.62);}
+.sell-bg .stag{color:var(--lime);}
+.sgrid{display:grid;grid-template-columns:1fr 1.15fr;gap:4rem;align-items:start;}
+.blist{display:flex;flex-direction:column;gap:1.4rem;}
+.bitem{display:flex;gap:1rem;align-items:flex-start;}
+.bico{width:44px;height:44px;border-radius:50%;background:rgba(106,170,64,.18);border:1px solid var(--sprout);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.btitle{color:var(--wheat);font-weight:700;margin-bottom:.25rem;}
+.bdesc{color:rgba(240,212,122,.55);font-size:.88rem;line-height:1.55;}
+.sform{background:rgba(255,255,255,.06);border:1px solid rgba(106,170,64,.3);border-radius:10px;padding:2.4rem;}
+.ftitle{color:var(--wheat);font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;margin-bottom:1.5rem;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.fg{margin-bottom:1.1rem;}
+.flbl{display:block;color:rgba(240,212,122,.65);font-size:.76rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:.35rem;}
+.fc{width:100%;padding:10px 13px;background:rgba(255,255,255,.08);border:1px solid rgba(106,170,64,.3);border-radius:4px;color:var(--wheat);font-family:'DM Sans',sans-serif;font-size:.93rem;outline:none;transition:border-color .2s;}
+.fc:focus{border-color:var(--sprout);background:rgba(255,255,255,.11);}
+.fc::placeholder{color:rgba(240,212,122,.3);}
+.fc option{background:var(--soil);}
+.fsub{width:100%;padding:13px;background:var(--sprout);color:var(--soil);border:none;border-radius:4px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.97rem;transition:background .2s;margin-top:.4rem;}
+.fsub:hover{background:var(--harvest);}
+
+/* ══════════════════════════════════════════
+   PESTICIDE CARDS
+══════════════════════════════════════════ */
+.pest-bg{background:#fff;}
+.pest-warning{
+  display:flex;gap:1.2rem;align-items:flex-start;
+  background:#fff8f0;border:1px solid rgba(212,144,10,.35);border-radius:8px;
+  padding:1.2rem 1.5rem;margin-bottom:2.5rem;
+}
+.pest-warning-icon{font-size:1.8rem;flex-shrink:0;margin-top:.1rem;}
+.pest-warning p{color:var(--bark);font-size:.9rem;line-height:1.6;}
+.pest-warning strong{color:var(--soil);}
+.pest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.4rem;margin-bottom:3rem;}
+
+/* Enhanced pesticide card */
+.pestcard{
+  background:var(--cream);border:1px solid rgba(212,144,10,.2);border-radius:12px;
+  overflow:hidden;transition:transform .25s,box-shadow .25s;
+  position:relative;
+}
+.pestcard:hover{transform:translateY(-5px);box-shadow:0 14px 40px rgba(30,18,8,.12);}
+.pestimg{
+  height:150px;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:#f5f5ec;
+}
+.pestimg img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
+.pestcard:hover .pestimg img{transform:scale(1.07);}
+.pestimg-emoji{font-size:3.5rem;line-height:1;}
+.pest-type{position:absolute;top:9px;left:9px;font-size:.64rem;font-weight:700;padding:3px 9px;border-radius:2px;text-transform:uppercase;letter-spacing:.4px;z-index:1;}
+.type-insecticide{background:#c0392b;color:#fff;}
+.type-fungicide{background:#8e44ad;color:#fff;}
+.type-herbicide{background:#16a085;color:#fff;}
+.type-organic{background:#27ae60;color:#fff;}
+.pest-wishlist{
+  position:absolute;top:9px;right:9px;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.85);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;
+  transition:background .2s;z-index:2;
+}
+.pest-wishlist.active{background:#ffe0e0;}
+.pestinfo{padding:1.1rem;}
+.pestname{font-weight:700;font-size:.97rem;color:var(--soil);margin-bottom:.2rem;}
+.pest-stars{display:flex;align-items:center;gap:.2rem;margin-bottom:.3rem;}
+.pest-star{color:#ddd;font-size:.72rem;}
+.pest-star.filled{color:var(--harvest);}
+.pestmeta{font-size:.8rem;color:var(--bark);margin-bottom:.7rem;}
+.pest-stock{font-size:.74rem;font-weight:600;color:#27ae60;margin-bottom:.5rem;}
+.pestfoot{display:flex;align-items:center;justify-content:space-between;}
+.pestprice{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--warn);}
+.pestprice small{font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--bark);font-weight:400;}
+.pest-btns{display:flex;gap:.4rem;}
+
+/* ══════════════════════════════════════════
+   SELL PESTICIDE FORM
+══════════════════════════════════════════ */
+.pest-sell{background:var(--mist);border-radius:10px;padding:2.5rem;border:1px solid rgba(212,144,10,.2);}
+.pest-sell-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:3rem;align-items:start;}
+.pest-features{display:flex;flex-direction:column;gap:1.2rem;}
+.pfeat{display:flex;gap:.9rem;align-items:flex-start;}
+.pfeat-ico{width:40px;height:40px;border-radius:50%;background:rgba(212,144,10,.15);border:1px solid rgba(212,144,10,.4);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.pfeat-title{color:var(--soil);font-weight:700;font-size:.93rem;margin-bottom:.2rem;}
+.pfeat-desc{color:var(--bark);font-size:.85rem;line-height:1.5;}
+
+/* ══════════════════════════════════════════
+   FEATURES
+══════════════════════════════════════════ */
+.feat-bg{background:var(--mist);}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.8rem;}
+.fcard{background:#fff;border-radius:8px;padding:2rem;border:1px solid rgba(74,124,48,.15);transition:border-color .2s,transform .2s;}
+.fcard:hover{border-color:var(--sprout);transform:translateY(-3px);}
+.fcard-ico{font-size:2.3rem;margin-bottom:.8rem;}
+.fcard-name{font-family:'Playfair Display',serif;font-weight:700;font-size:1.1rem;color:var(--soil);margin-bottom:.4rem;}
+.fcard-desc{color:var(--bark);font-size:.88rem;line-height:1.6;}
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+footer{background:var(--soil);padding:4rem 5vw 2rem;border-top:2px solid var(--sprout);}
+.finner{max-width:1260px;margin:0 auto;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem;}
+.fbrand p{color:rgba(240,212,122,.5);font-size:.88rem;line-height:1.65;margin-top:.8rem;}
+.fcol h4{color:var(--wheat);font-weight:700;font-size:.8rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:1rem;}
+.fcol ul{list-style:none;}
+.fcol li{margin-bottom:.5rem;}
+.fcol a{color:rgba(240,212,122,.45);text-decoration:none;font-size:.88rem;transition:color .2s;}
+.fcol a:hover{color:var(--lime);}
+.fbot{border-top:1px solid rgba(240,212,122,.1);padding-top:1.5rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.8rem;}
+.fbot p{color:rgba(240,212,122,.35);font-size:.82rem;}
+
+/* ══════════════════════════════════════════
+   CART FLOAT
+══════════════════════════════════════════ */
+.cart-float{
+  position:fixed;bottom:2rem;right:2rem;z-index:199;
+  background:var(--leaf);color:#fff;
+  border-radius:50px;padding:13px 22px;
+  display:flex;align-items:center;gap:.5rem;
+  font-weight:700;font-size:.88rem;cursor:pointer;
+  box-shadow:0 4px 20px rgba(30,18,8,.3);
+  transform:translateY(120px);transition:transform .35s,background .2s;
+}
+.cart-float.show{transform:translateY(0);}
+.cart-float:hover{background:var(--moss);}
+.cbadge{background:var(--harvest);color:var(--soil);border-radius:50%;width:21px;height:21px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+.toast{
+  position:fixed;top:74px;right:2rem;z-index:9000;
+  min-width:200px;max-width:320px;
+  background:var(--moss);color:#fff;
+  padding:12px 18px;border-radius:6px;font-weight:600;font-size:.88rem;
+  transform:translateX(calc(100% + 3rem));transition:transform .35s cubic-bezier(.22,1,.36,1);
+  box-shadow:0 4px 20px rgba(0,0,0,.25);pointer-events:none;
+  display:flex;align-items:center;gap:.6rem;
+}
+.toast.on{transform:translateX(0);}
+.toast.error-toast{background:#c0392b;}
+.toast.info-toast{background:var(--harvest);}
+
+/* ══════════════════════════════════════════
+   QUICK VIEW MODAL
+══════════════════════════════════════════ */
+#quickViewModal{
+  position:fixed;inset:0;z-index:3000;
+  background:rgba(10,5,2,.75);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:1rem;
+}
+#quickViewModal.open{display:flex;}
+.qv-box{
+  background:var(--cream);border-radius:14px;
+  max-width:560px;width:100%;max-height:90vh;overflow-y:auto;
+  animation:authIn .4s ease both;
+}
+.qv-img{height:240px;overflow:hidden;background:#f0f0e8;border-radius:14px 14px 0 0;}
+.qv-img img{width:100%;height:100%;object-fit:cover;}
+.qv-body{padding:1.8rem;}
+.qv-name{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--soil);margin-bottom:.4rem;}
+.qv-meta{color:var(--bark);font-size:.88rem;margin-bottom:.8rem;}
+.qv-price{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--leaf);margin-bottom:1.2rem;}
+.qv-btns{display:flex;gap:.8rem;}
+.qv-close-btn{position:absolute;top:1rem;right:1rem;background:rgba(30,18,8,.6);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+.qv-wrap{position:relative;}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:960px){
+  .hero-inner,.sgrid,.pest-sell-grid{grid-template-columns:1fr;}
+  .fgrid{grid-template-columns:1fr 1fr;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  .hamburger{display:flex;}
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:rgba(30,18,8,.98);flex-direction:column;padding:1.5rem 5vw;gap:1.2rem;}
+  .nav-links.open{display:flex;}
+  .nav-user{display:none;}
+  .auth-panel{padding:2rem 1.5rem;}
+}
+@media(max-width:600px){
+  .fgrid{grid-template-columns:1fr;}
+  .hero-cards{grid-template-columns:1fr 1fr;}
+  .frow{grid-template-columns:1fr;}
+  .role-select-grid{grid-template-columns:1fr 1fr;}
+  .af-row{grid-template-columns:1fr;}
+  .auth-panel{max-width:100%;}
+  .qv-btns{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     PAGE LOADER
+═══════════════════════════════════════ -->
+<div id="pageLoader">
+  <div class="loader-logo">Agri <em>KULTURE</em></div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-text">Farm to Future</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     AUTH OVERLAY
+═══════════════════════════════════════ -->
+<div id="authOverlay">
+  <div class="auth-panel">
+    <div class="auth-logo">
+      <a href="#">Agri <em>KULTURE</em></a>
+      <p>Farm to Future · Direct from Soil</p>
+    </div>
+
+    <!-- Landing -->
+    <div class="auth-page active" id="authLanding">
+      <div class="auth-landing-title">Welcome to Agri KULTURE</div>
+      <div class="auth-landing-sub">India's direct agriculture marketplace — no middlemen, maximum value.</div>
+      <div class="auth-main-btns">
+        <button class="auth-btn-primary" onclick="showAuthPage('authLogin')">🌾 Login to Your Account</button>
+        <button class="auth-btn-secondary" onclick="showAuthPage('authRegister')">✨ Create New Account</button>
+      </div>
+      <button class="auth-btn-guest" onclick="continueAsGuest()">Continue as Guest →</button>
+    </div>
+
+    <!-- Login -->
+    <div class="auth-page" id="authLogin">
+      <button class="auth-back" onclick="showAuthPage('authLanding')">← Back</button>
+      <div class="auth-title">Welcome Back</div>
+      <div class="auth-sub">Login to access your farm marketplace</div>
+      <div class="af-msg" id="loginMsg"></div>
+
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="setLoginRole('customer',this)">👤 Customer</button>
+        <button class="role-tab" onclick="setLoginRole('farmer',this)">👨‍🌾 Farmer</button>
+        <button class="role-tab" onclick="setLoginRole('admin',this)">🛡️ Admin</button>
+      </div>
+
+      <div class="af">
+        <label class="af-label">Email or Phone</label>
+        <input class="af-input" id="loginEmail" type="text" placeholder="you@example.com or +91 98765 43210" autocomplete="username">
+      </div>
+      <div class="af">
+        <label class="af-label">Password</label>
+        <div class="af-wrap">
+          <input class="af-input" id="loginPassword" type="password" placeholder="Enter your password" autocomplete="current-password">
+          <button class="af-eye" type="button" onclick="togglePwd('loginPassword',this)">👁</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <div class="af-check" style="margin-bottom:0;">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">Remember Me</label>
+        </div>
+        <div class="af-forgot"><a onclick="showAuthPage('authForgot')" style="cursor:pointer;">Forgot Password?</a></div>
+      </div>
+      <button class="af-submit" id="loginBtn" onclick="handleLogin()">Login →</button>
+
+      <div class="af-divider"><span>or continue with</span></div>
+      <div class="social-btns">
+        <button class="social-btn" onclick="socialLogin('Google')">
+          <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+        <button class="social-btn" onclick="showAuthPage('authOTP')">
+          📱 Login with Phone OTP
+        </button>
+      </div>
+      <div class="af-switch">Don't have an account? <a onclick="showAuthPage('authRegister')">Register here</a></div>
+    </div>
+
+    <!-- Register -->
+    <div class="auth-page" id="authRegister">
+      <button class="auth-back" onclick="showAuthPage('authLanding')">← Back</button>
+      <div class="auth-title">Create Account</div>
+      <div class="auth-sub">Join thousands of farmers and buyers across India</div>
+      <div class="af-msg" id="registerMsg"></div>
+
+      <div style="margin-bottom:1rem;">
+        <label class="af-label">Register as</label>
+        <div class="role-select-grid">
+          <div class="role-card selected" data-role="customer" onclick="selectRegRole(this,'customer')">
+            <div class="role-card-ico">🛒</div>
+            <div class="role-card-lbl">Customer</div>
+          </div>
+          <div class="role-card" data-role="farmer" onclick="selectRegRole(this,'farmer')">
+            <div class="role-card-ico">👨‍🌾</div>
+            <div class="role-card-lbl">Farmer</div>
+          </div>
+          <div class="role-card" data-role="seller" onclick="selectRegRole(this,'seller')">
+            <div class="role-card-ico">🧪</div>
+            <div class="role-card-lbl">Pesticide Seller</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="af-row">
+        <div class="af">
+          <label class="af-label">Full Name</label>
+          <input class="af-input" id="regName" type="text" placeholder="Ramesh Patil">
+        </div>
+        <div class="af">
+          <label class="af-label">Phone Number</label>
+          <input class="af-input" id="regPhone" type="tel" placeholder="+91 98765 43210">
+        </div>
+      </div>
+      <div class="af">
+        <label class="af-label">Email Address</label>
+        <input class="af-input" id="regEmail" type="email" placeholder="ramesh@example.com">
+      </div>
+      <div class="af-row">
+        <div class="af">
+          <label class="af-label">Password</label>
+          <div class="af-wrap">
+            <input class="af-input" id="regPassword" type="password" placeholder="Min 6 characters">
+            <button class="af-eye" type="button" onclick="togglePwd('regPassword',this)">👁</button>
+          </div>
+        </div>
+        <div class="af">
+          <label class="af-label">Confirm Password</label>
+          <div class="af-wrap">
+            <input class="af-input" id="regConfirm" type="password" placeholder="Repeat password">
+            <button class="af-eye" type="button" onclick="togglePwd('regConfirm',this)">👁</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Farmer extra fields -->
+      <div class="extra-fields" id="farmerFields">
+        <div class="af-row">
+          <div class="af">
+            <label class="af-label">Farm Name</label>
+            <input class="af-input" type="text" placeholder="Patil Organic Farm">
+          </div>
+          <div class="af">
+            <label class="af-label">District</label>
+            <select class="af-input">
+              <option value="">Select District</option>
+              <option>Pune</option><option>Nashik</option><option>Satara</option>
+              <option>Solapur</option><option>Kolhapur</option><option>Nagpur</option>
+              <option>Aurangabad</option><option>Jalgaon</option>
+            </select>
+          </div>
+        </div>
+        <div class="af">
+          <label class="af-label">Primary Crop Type</label>
+          <input class="af-input" type="text" placeholder="e.g. Tomatoes, Onions, Rice">
+        </div>
+      </div>
+
+      <!-- Seller extra fields -->
+      <div class="extra-fields" id="sellerFields">
+        <div class="af-row">
+          <div class="af">
+            <label class="af-label">Company Name</label>
+            <input class="af-input" type="text" placeholder="AgriChem Pvt. Ltd.">
+          </div>
+          <div class="af">
+            <label class="af-label">CIBRC License No.</label>
+            <input class="af-input" type="text" placeholder="CIB/2024/XXXX">
+          </div>
+        </div>
+      </div>
+
+      <div class="af-check">
+        <input type="checkbox" id="regTerms">
+        <label for="regTerms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+      </div>
+      <button class="af-submit" onclick="handleRegister()">Create My Account →</button>
+      <div class="af-switch">Already have an account? <a onclick="showAuthPage('authLogin')">Login here</a></div>
+    </div>
+
+    <!-- Forgot Password -->
+    <div class="auth-page" id="authForgot">
+      <button class="auth-back" onclick="showAuthPage('authLogin')">← Back to Login</button>
+      <div class="auth-title">Reset Password</div>
+      <div class="auth-sub">We'll send you a verification code</div>
+      <div class="af-msg" id="forgotMsg"></div>
+
+      <div id="forgotStep1">
+        <div class="af">
+          <label class="af-label">Email or Phone Number</label>
+          <input class="af-input" id="forgotInput" type="text" placeholder="you@example.com or +91 98765 43210">
+        </div>
+        <button class="af-submit" onclick="sendOTP()">Send OTP →</button>
+      </div>
+
+      <div id="forgotStep2" style="display:none;">
+        <div class="auth-sub" style="margin-bottom:1rem;">Enter the 6-digit code sent to your email/phone</div>
+        <div class="otp-row">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,0)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,1)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,2)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,3)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,4)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,5)">
+        </div>
+        <button class="af-submit" onclick="verifyOTP()">Verify OTP →</button>
+        <div class="af-switch">Didn't receive? <a onclick="sendOTP()">Resend OTP</a></div>
+      </div>
+
+      <div id="forgotStep3" style="display:none;">
+        <div class="af">
+          <label class="af-label">New Password</label>
+          <div class="af-wrap">
+            <input class="af-input" id="newPwd" type="password" placeholder="Min 6 characters">
+            <button class="af-eye" type="button" onclick="togglePwd('newPwd',this)">👁</button>
+          </div>
+        </div>
+        <div class="af">
+          <label class="af-label">Confirm New Password</label>
+          <input class="af-input" id="newPwdConfirm" type="password" placeholder="Repeat new password">
+        </div>
+        <button class="af-submit" onclick="resetPassword()">Reset Password →</button>
+      </div>
+    </div>
+
+    <!-- Phone OTP Login -->
+    <div class="auth-page" id="authOTP">
+      <button class="auth-back" onclick="showAuthPage('authLogin')">← Back</button>
+      <div class="auth-title">Phone OTP Login</div>
+      <div class="auth-sub">Quick and secure login via SMS</div>
+      <div class="af">
+        <label class="af-label">Mobile Number</label>
+        <input class="af-input" id="otpPhone" type="tel" placeholder="+91 98765 43210">
+      </div>
+      <button class="af-submit" id="sendOtpBtn" onclick="sendPhoneOTP()">Send OTP →</button>
+      <div id="otpVerifyBox" style="display:none;">
+        <div class="auth-sub" style="margin:1rem 0 .5rem;">Enter the 6-digit OTP</div>
+        <div class="otp-row">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,0)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,1)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,2)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,3)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,4)">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,5)">
+        </div>
+        <button class="af-submit" onclick="verifyPhoneOTP()">Verify & Login →</button>
+      </div>
+    </div>
+
+    <!-- Success screen -->
+    <div class="auth-success-screen" id="authSuccess">
+      <div class="success-checkmark">✓</div>
+      <div class="success-name" id="successName">Welcome!</div>
+      <div class="success-msg" id="successMsg">Redirecting to marketplace…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Auth Required Modal -->
+<div id="authRequired" style="display:none;">
+  <div class="auth-req-box">
+    <div class="auth-req-ico">🔐</div>
+    <div class="auth-req-title">Login Required</div>
+    <div class="auth-req-msg" id="authReqMsg">Please login or create an account to continue using this feature.</div>
+    <div class="auth-req-btns">
+      <button class="auth-btn-primary" style="padding:10px 24px;width:auto;" onclick="closeAuthRequired();showAuthOverlay();">Login / Register</button>
+      <button class="auth-req-close" onclick="closeAuthRequired()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     QUICK VIEW MODAL
+═══════════════════════════════════════ -->
+<div id="quickViewModal">
+  <div class="qv-wrap">
+    <button class="qv-close-btn" onclick="closeQV()">✕</button>
+    <div class="qv-box" id="qvContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     NAV
+═══════════════════════════════════════ -->
+<nav id="nav">
+  <a href="#" class="logo">Agri <em>KULTURE</em></a>
+  <div class="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#marketplace">Buy Produce</a></li>
+    <li><a href="#sell">Sell Produce</a></li>
+    <li><a href="#pesticides">Pesticides</a></li>
+    <li><a href="#features">Platform</a></li>
+    <li id="navGuestLinks"><a href="#marketplace" class="nav-cta" onclick="checkAuthForNav()">Shop Now</a></li>
+  </ul>
+  <div class="nav-user" id="navUserSection" style="display:none;">
+    <span class="nav-username" id="navUserName">👤 User</span>
+    <button class="nav-logout" onclick="handleLogout()">Logout</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     HERO
+═══════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-orb orb1"></div>
+  <div class="hero-orb orb2"></div>
+  <div class="hero-orb orb3"></div>
+  <div class="particles" id="particles"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">🌾 Field to Doorstep — No Middlemen</div>
+      <h1 class="hero-h1">India's Direct<span class="green">Farm Market</span></h1>
+      <p class="hero-p">Agri KULTURE connects farmers directly with consumers. Buy fresh produce, sell your harvest at fair prices, and source certified pesticides — all in one platform.</p>
+      <div class="hero-btns">
+        <a href="#marketplace" class="btn btn-green">🛒 Shop Fresh Produce</a>
+        <a href="#sell" class="btn btn-ghost">Sell Your Harvest →</a>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <div class="hcard"><div class="hcard-icon">👨‍🌾</div><div class="hcard-num">2,400+</div><div class="hcard-lbl">Registered Farmers</div></div>
+      <div class="hcard"><div class="hcard-icon">🌍</div><div class="hcard-num">18</div><div class="hcard-lbl">Districts Covered</div></div>
+      <div class="hcard"><div class="hcard-icon">🥕</div><div class="hcard-num">320+</div><div class="hcard-lbl">Products Listed</div></div>
+      <div class="hcard"><div class="hcard-icon">📦</div><div class="hcard-num">98%</div><div class="hcard-lbl">On-Time Delivery</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     BUY MARKETPLACE
+═══════════════════════════════════════ -->
+<section class="section market-bg" id="marketplace">
+  <div class="inner">
+    <div class="stag">Local Market</div>
+    <h2 class="sh">Buy Fresh from Nearby Farms</h2>
+    <p class="sp">Browse produce sourced within 50 km of your location. Freshness guaranteed, prices fair. No intermediaries — direct from farmer to you.</p>
+    <div class="tabs" id="tabs">
+      <button class="tab on" onclick="filterProd('all',this)">All Produce</button>
+      <button class="tab" onclick="filterProd('vegetables',this)">Vegetables</button>
+      <button class="tab" onclick="filterProd('fruits',this)">Fruits</button>
+      <button class="tab" onclick="filterProd('grains',this)">Grains & Pulses</button>
+      <button class="tab" onclick="filterProd('dairy',this)">Dairy</button>
+    </div>
+    <div class="mfilters">
+      <input class="finput" id="searchProd" type="text" placeholder="🔍  Search tomatoes, wheat, milk..." oninput="searchProd()">
+      <select class="fsel" onchange="sortProd(this.value)">
+        <option value="">Sort by</option>
+        <option value="low">Price: Low → High</option>
+        <option value="high">Price: High → Low</option>
+        <option value="near">Nearest First</option>
+        <option value="org">Organic First</option>
+      </select>
+      <select class="fsel">
+        <option>📍 Pune, Maharashtra</option>
+        <option>Mumbai</option><option>Nashik</option><option>Nagpur</option>
+      </select>
+    </div>
+    <div class="pgrid" id="prodGrid"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SELL PRODUCE
+═══════════════════════════════════════ -->
+<section class="section sell-bg" id="sell">
+  <div class="inner">
+    <div class="sgrid">
+      <div>
+        <div class="stag">For Farmers</div>
+        <h2 class="sh">Sell Your Harvest at Fair Prices</h2>
+        <p class="sp">List your produce directly on Agri KULTURE. Reach thousands of buyers in your region, negotiate prices, and get paid fast — zero middlemen.</p>
+        <div class="blist">
+          <div class="bitem"><div class="bico">🚫</div><div><div class="btitle">No Middlemen</div><div class="bdesc">Sell directly to consumers and retailers — retain up to 40% more income per sale.</div></div></div>
+          <div class="bitem"><div class="bico">📊</div><div><div class="btitle">Market Price Insights</div><div class="bdesc">Access live price trends, demand forecasting, and competitor data to price optimally.</div></div></div>
+          <div class="bitem"><div class="bico">💳</div><div><div class="btitle">Secure Fast Payments</div><div class="bdesc">Guaranteed payment within 48 hrs of delivery via UPI, bank transfer, or wallet.</div></div></div>
+          <div class="bitem"><div class="bico">🤖</div><div><div class="btitle">AI Pricing Suggestions</div><div class="bdesc">Smart system recommends optimal prices based on soil, crop type, and demand trends.</div></div></div>
+        </div>
+      </div>
+      <div class="sform">
+        <div class="ftitle">📋 List Your Produce</div>
+        <div class="frow">
+          <div class="fg"><label class="flbl">Your Name</label><input class="fc" type="text" placeholder="Ramesh Patil"></div>
+          <div class="fg"><label class="flbl">Phone</label><input class="fc" type="tel" placeholder="+91 98765 43210"></div>
+        </div>
+        <div class="fg"><label class="flbl">Produce Name</label><input class="fc" type="text" placeholder="e.g. Organic Tomatoes, Basmati Rice"></div>
+        <div class="frow">
+          <div class="fg"><label class="flbl">Category</label>
+            <select class="fc"><option>Select Category</option><option>Vegetables</option><option>Fruits</option><option>Grains & Pulses</option><option>Dairy</option><option>Spices</option></select>
+          </div>
+          <div class="fg"><label class="flbl">Quantity (kg)</label><input class="fc" type="number" placeholder="50"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label class="flbl">Price per kg (₹)</label><input class="fc" type="number" placeholder="80"></div>
+          <div class="fg"><label class="flbl">Your District</label>
+            <select class="fc"><option>Pune</option><option>Nashik</option><option>Satara</option><option>Solapur</option><option>Kolhapur</option></select>
+          </div>
+        </div>
+        <div class="fg"><label class="flbl">Description (optional)</label><input class="fc" type="text" placeholder="Fresh, naturally grown, no pesticides..."></div>
+        <button class="fsub" onclick="sellFormSubmit()">🌾 List My Produce Now</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     PESTICIDES MARKETPLACE
+═══════════════════════════════════════ -->
+<section class="section pest-bg" id="pesticides">
+  <div class="inner">
+    <div class="stag">Agri Inputs</div>
+    <h2 class="sh">Pesticides & Crop Protection</h2>
+    <p class="sp">Buy and sell certified pesticides, herbicides, fungicides, and organic alternatives. Verified sellers only — all products comply with CIBRC regulations.</p>
+    <div class="pest-warning">
+      <div class="pest-warning-icon">⚠️</div>
+      <p><strong>Regulated Products:</strong> All pesticides listed here are verified and certified by registered sellers. Buyers must be registered farmers or licensed agri dealers. Misuse of chemical pesticides can cause soil degradation and harm to health. Always follow label instructions and consult an agronomist before use.</p>
+    </div>
+    <div class="tabs" id="pestTabs">
+      <button class="tab on" onclick="filterPest('all',this)">All Products</button>
+      <button class="tab" onclick="filterPest('insecticide',this)">Insecticides</button>
+      <button class="tab" onclick="filterPest('fungicide',this)">Fungicides</button>
+      <button class="tab" onclick="filterPest('herbicide',this)">Herbicides</button>
+      <button class="tab" onclick="filterPest('organic',this)">Organic</button>
+    </div>
+    <div class="mfilters">
+      <input class="finput" id="searchPest" type="text" placeholder="🔍  Search pesticide name or crop..." oninput="searchPestFn()">
+      <select class="fsel" onchange="sortPest(this.value)">
+        <option value="">Sort by</option>
+        <option value="low">Price: Low → High</option>
+        <option value="high">Price: High → Low</option>
+        <option value="org">Organic First</option>
+      </select>
+    </div>
+    <div class="pest-grid" id="pestGrid"></div>
+
+    <!-- Sell Pesticide -->
+    <div class="pest-sell">
+      <div class="sh" style="font-size:1.6rem;margin-bottom:.5rem;">Sell Pesticides on Agri KULTURE</div>
+      <p class="sp" style="margin-bottom:2rem;">Are you a certified agri-dealer or manufacturer? List your products and reach thousands of farmers directly.</p>
+      <div class="pest-sell-grid">
+        <div class="pest-features">
+          <div class="pfeat"><div class="pfeat-ico">✅</div><div><div class="pfeat-title">Verified Seller Badge</div><div class="pfeat-desc">Get a verified badge after submitting your CIBRC license. Builds trust with farmer-buyers.</div></div></div>
+          <div class="pfeat"><div class="pfeat-ico">📦</div><div><div class="pfeat-title">Bulk & Retail Listings</div><div class="pfeat-desc">List products in bulk for dealers or small packs for individual farmers — flexible quantities.</div></div></div>
+          <div class="pfeat"><div class="pfeat-ico">🌿</div><div><div class="pfeat-title">Promote Organic Options</div><div class="pfeat-desc">Organic and bio-pesticide listings are highlighted and promoted across the platform.</div></div></div>
+          <div class="pfeat"><div class="pfeat-ico">📊</div><div><div class="pfeat-title">Sales Analytics</div><div class="pfeat-desc">Track views, inquiries, and conversions for each of your listed products in real time.</div></div></div>
+        </div>
+        <div class="sform" style="background:rgba(212,144,10,.06);border-color:rgba(212,144,10,.3);">
+          <div class="ftitle" style="color:var(--soil);">🧪 List a Pesticide Product</div>
+          <div class="frow">
+            <div class="fg"><label class="flbl" style="color:var(--bark);">Seller / Company Name</label><input class="fc" style="background:#fff;color:var(--soil);border-color:rgba(212,144,10,.3);" type="text" placeholder="AgriChem Pvt. Ltd."></div>
+            <div class="fg"><label class="flbl" style="color:var(--bark);">CIBRC License No.</label><input class="fc" style="background:#fff;color:var(--soil);border-color:rgba(212,144,10,.3);" type="text" placeholder="CIB/2024/XXXX"></div>
+          </div>
+          <div class="fg"><label class="flbl" style="color:var(--bark);">Product Name</label><input class="fc" style="background:#fff;color:var(--soil);border-color:rgba(212,144,10,.3);" type="text" placeholder="e.g. Chlorpyrifos 20% EC"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl" style="color:var(--bark);">Type</label>
+              <select class="fc" style="background:#fff;color:var(--soil);border-color:rgba(212,144,10,.3);"><option>Select Type</option><option>Insecticide</option><option>Fungicide</option><option>Herbicide</option><option>Organic / Bio</option><option>Fertilizer</option></select>
+            </div>
+            <div class="fg"><label class="flbl" style="color:var(--bark);">Price per unit (₹)</label><input class="fc" style="background:#fff;color:var(--soil);border-color:rgba(212,144,10,.3);" type="number" placeholder="450"></div>
+          </div>
+          <div class="fg"><label class="flbl" style="color:var(--bark);">Target Crop / Use</label><input class="fc" style="background:#fff;color:var(--soil);border-color:rgba(212,144,10,.3);" type="text" placeholder="e.g. Cotton, Rice, All crops"></div>
+          <button class="fsub" style="background:var(--warn);" onclick="pestSellSubmit()">🧪 List My Product Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORM FEATURES -->
+<section class="section feat-bg" id="features">
+  <div class="inner">
+    <div class="stag">Platform</div>
+    <h2 class="sh">Built for Agriculture's Future</h2>
+    <p class="sp">Agri KULTURE combines AI, community data, and sustainable practices to transform India's agricultural ecosystem.</p>
+    <div class="fgrid">
+      <div class="fcard"><div class="fcard-ico">🤖</div><div class="fcard-name">AI Crop Disease Detection</div><div class="fcard-desc">Upload a photo of your crop. Our ML model instantly identifies diseases and recommends treatment plans — reducing losses before they occur.</div></div>
+      <div class="fcard"><div class="fcard-ico">📊</div><div class="fcard-name">Smart Price Analytics</div><div class="fcard-desc">Real-time market price trends, demand forecasting, and AI-powered pricing suggestions help farmers sell at peak value every time.</div></div>
+      <div class="fcard"><div class="fcard-ico">🌱</div><div class="fcard-name">Fertilizer Recommender</div><div class="fcard-desc">Input soil data, crop type, and local weather to receive personalised fertilizer recommendations that sustainably boost yield.</div></div>
+      <div class="fcard"><div class="fcard-ico">📍</div><div class="fcard-name">Hyperlocal Market Access</div><div class="fcard-desc">Find buyers and sellers within your district. Reduce transportation costs and environmental footprint through local trade.</div></div>
+      <div class="fcard"><div class="fcard-ico">🛡️</div><div class="fcard-name">Secure Escrow Payments</div><div class="fcard-desc">Payments are held in escrow until delivery is confirmed — protecting both buyers and farmers in every transaction.</div></div>
+      <div class="fcard"><div class="fcard-ico">📱</div><div class="fcard-name">Mobile-First Design</div><div class="fcard-desc">Works on low-bandwidth connections and in regional languages. Designed for farmers in rural Maharashtra and beyond.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="finner">
+    <div class="footer-grid">
+      <div class="fbrand">
+        <a href="#" class="logo" style="font-size:1.7rem;">Agri <em>KULTURE</em></a>
+        <p>Empowering farmers with technology. Connecting communities with fresh produce. Building a sustainable agricultural future for India — no middlemen, maximum value.</p>
+      </div>
+      <div class="fcol"><h4>Marketplace</h4><ul><li><a href="#">Buy Produce</a></li><li><a href="#">Sell Harvest</a></li><li><a href="#">Pesticides</a></li><li><a href="#">Bulk Orders</a></li></ul></div>
+      <div class="fcol"><h4>Platform</h4><ul><li><a href="#">AI Disease Detection</a></li><li><a href="#">Fertilizer Guide</a></li><li><a href="#">Market Insights</a></li><li><a href="#">Farmer Portal</a></li></ul></div>
+      <div class="fcol"><h4>Info</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Our Mission</a></li><li><a href="#">Contact</a></li></ul></div>
+    </div>
+    <div class="fbot">
+      <p>© 2024 Agri KULTURE. All rights reserved. Built for Agriculture's Future.</p>
+      <p style="color:rgba(106,170,64,.5);">Agriculture · FoodTech · Rural Development</p>
+    </div>
+  </div>
+</footer>
+
+<!-- CART FLOAT -->
+<div class="cart-float" id="cartFloat" onclick="viewCart()">🛒 Cart <div class="cbadge" id="cartBadge">0</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let currentUser = null;
+let currentLoginRole = 'customer';
+let currentRegRole = 'customer';
+let wishlistProds = new Set();
+let wishlistPests = new Set();
+let forgotStep = 1;
+
+/* ═══════════════════════════════════════════
+   PAGE LOADER
+═══════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('pageLoader').classList.add('hidden');
+    // Check if already logged in
+    const saved = localStorage.getItem('agriUser');
+    if (saved) {
+      currentUser = JSON.parse(saved);
+      hideAuthOverlay();
+      updateNavForUser();
+    } else {
+      document.getElementById('authOverlay').classList.remove('hidden');
+    }
+  }, 1500);
+});
+
+/* ═══════════════════════════════════════════
+   AUTH OVERLAY MANAGEMENT
+═══════════════════════════════════════════ */
+function showAuthOverlay() {
+  document.getElementById('authOverlay').classList.remove('hidden');
+  showAuthPage('authLanding');
+}
+function hideAuthOverlay() {
+  document.getElementById('authOverlay').classList.add('hidden');
+}
+function showAuthPage(id) {
+  document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('authSuccess').classList.remove('show');
+  const page = document.getElementById(id);
+  if (page) page.classList.add('active');
+}
+function continueAsGuest() {
+  currentUser = { name: 'Guest', role: 'guest', isGuest: true };
+  hideAuthOverlay();
+  showToast('👤 Browsing as guest. Login to add items to cart.');
+}
+function setLoginRole(role, btn) {
+  currentLoginRole = role;
+  document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function selectRegRole(el, role) {
+  currentRegRole = role;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('farmerFields').classList.toggle('show', role === 'farmer');
+  document.getElementById('sellerFields').classList.toggle('show', role === 'seller');
+}
+
+/* ═══════════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════════ */
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pwd = document.getElementById('loginPassword').value;
+  const msg = document.getElementById('loginMsg');
+  msg.className = 'af-msg';
+
+  if (!email) { showAuthMsg('loginMsg','error','Please enter your email or phone number.'); return; }
+  if (!pwd) { showAuthMsg('loginMsg','error','Please enter your password.'); return; }
+  if (pwd.length < 4) { showAuthMsg('loginMsg','error','Password seems too short.'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'Logging in…';
+
+  // Simulate async login
+  setTimeout(() => {
+    const name = email.includes('@') ? email.split('@')[0] : 'Farmer';
+    const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+    const user = { name: displayName, email, role: currentLoginRole, isGuest: false };
+
+    if (document.getElementById('rememberMe').checked) {
+      localStorage.setItem('agriUser', JSON.stringify(user));
+    }
+    currentUser = user;
+    loginSuccess(user);
+    btn.disabled = false;
+    btn.textContent = 'Login →';
+  }, 900);
+}
+
+function loginSuccess(user) {
+  document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('active'));
+  const s = document.getElementById('authSuccess');
+  s.classList.add('show');
+  document.getElementById('successName').textContent = `Welcome back, ${user.name}! 🌾`;
+  document.getElementById('successMsg').textContent = `Logged in as ${user.role} — redirecting…`;
+  setTimeout(() => {
+    hideAuthOverlay();
+    updateNavForUser();
+    showToast(`✅ Welcome back, ${user.name}!`);
+  }, 1800);
+}
+
+/* ═══════════════════════════════════════════
+   REGISTER
+═══════════════════════════════════════════ */
+function handleRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const pwd = document.getElementById('regPassword').value;
+  const confirm = document.getElementById('regConfirm').value;
+  const terms = document.getElementById('regTerms').checked;
+
+  if (!name) { showAuthMsg('registerMsg','error','Please enter your full name.'); return; }
+  if (!email && !phone) { showAuthMsg('registerMsg','error','Please enter email or phone number.'); return; }
+  if (pwd.length < 6) { showAuthMsg('registerMsg','error','Password must be at least 6 characters.'); return; }
+  if (pwd !== confirm) { showAuthMsg('registerMsg','error','Passwords do not match.'); return; }
+  if (!terms) { showAuthMsg('registerMsg','error','Please accept the Terms of Service.'); return; }
+
+  const user = { name, email, phone, role: currentRegRole, isGuest: false };
+  localStorage.setItem('agriUser', JSON.stringify(user));
+  currentUser = user;
+
+  document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('active'));
+  const s = document.getElementById('authSuccess');
+  s.classList.add('show');
+  document.getElementById('successName').textContent = `Welcome, ${name}! 🌱`;
+  document.getElementById('successMsg').textContent = `Account created as ${currentRegRole}. Entering marketplace…`;
+
+  setTimeout(() => {
+    hideAuthOverlay();
+    updateNavForUser();
+    showToast(`🎉 Account created! Welcome to Agri KULTURE, ${name}!`);
+  }, 1800);
+}
+
+/* ═══════════════════════════════════════════
+   SOCIAL / OTP LOGIN
+═══════════════════════════════════════════ */
+function socialLogin(provider) {
+  showToast(`ℹ️ ${provider} login integration coming soon!`,'info');
+}
+function sendPhoneOTP() {
+  const phone = document.getElementById('otpPhone').value.trim();
+  if (!phone) { showToast('Please enter your phone number.','error'); return; }
+  document.getElementById('otpVerifyBox').style.display = 'block';
+  document.getElementById('sendOtpBtn').textContent = 'OTP Sent ✓';
+  showToast('📱 Demo OTP sent! Use any 6 digits.');
+}
+function verifyPhoneOTP() {
+  const inputs = document.querySelectorAll('#authOTP .otp-input');
+  const otp = Array.from(inputs).map(i=>i.value).join('');
+  if (otp.length < 6) { showToast('Please enter complete OTP.','error'); return; }
+  const user = { name: 'Phone User', role: 'customer', isGuest: false };
+  currentUser = user;
+  localStorage.setItem('agriUser', JSON.stringify(user));
+  loginSuccess(user);
+}
+
+/* ═══════════════════════════════════════════
+   FORGOT PASSWORD
+═══════════════════════════════════════════ */
+function sendOTP() {
+  const val = document.getElementById('forgotInput') ? document.getElementById('forgotInput').value.trim() : '';
+  if (!val) { showAuthMsg('forgotMsg','error','Please enter your email or phone.'); return; }
+  document.getElementById('forgotStep1').style.display = 'none';
+  document.getElementById('forgotStep2').style.display = 'block';
+  showAuthMsg('forgotMsg','success','OTP sent! Use any 6 digits for this demo.');
+}
+function verifyOTP() {
+  const inputs = document.querySelectorAll('#authForgot .otp-input');
+  const otp = Array.from(inputs).map(i=>i.value).join('');
+  if (otp.length < 6) { showAuthMsg('forgotMsg','error','Please enter all 6 digits.'); return; }
+  document.getElementById('forgotStep2').style.display = 'none';
+  document.getElementById('forgotStep3').style.display = 'block';
+  document.getElementById('forgotMsg').className = 'af-msg';
+}
+function resetPassword() {
+  const p = document.getElementById('newPwd').value;
+  const c = document.getElementById('newPwdConfirm').value;
+  if (p.length < 6) { showAuthMsg('forgotMsg','error','Password must be at least 6 characters.'); return; }
+  if (p !== c) { showAuthMsg('forgotMsg','error','Passwords do not match.'); return; }
+  showAuthMsg('forgotMsg','success','Password reset! You can now login.');
+  setTimeout(() => {
+    showAuthPage('authLogin');
+    document.getElementById('forgotStep1').style.display='block';
+    document.getElementById('forgotStep2').style.display='none';
+    document.getElementById('forgotStep3').style.display='none';
+  }, 1500);
+}
+
+/* ═══════════════════════════════════════════
+   OTP INPUT NAVIGATION
+═══════════════════════════════════════════ */
+function otpNext(input, idx) {
+  if (input.value.length === 1) {
+    const siblings = input.closest('.otp-row').querySelectorAll('.otp-input');
+    if (siblings[idx+1]) siblings[idx+1].focus();
+  }
+}
+
+/* ═══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+function togglePwd(id, btn) {
+  const inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+function showAuthMsg(id, type, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.className = 'af-msg ' + type; el.textContent = msg; }
+}
+
+/* ═══════════════════════════════════════════
+   NAV USER STATE
+═══════════════════════════════════════════ */
+function updateNavForUser() {
+  if (!currentUser || currentUser.isGuest) {
+    document.getElementById('navUserSection').style.display = 'none';
+    return;
+  }
+  document.getElementById('navUserSection').style.display = 'flex';
+  document.getElementById('navUserName').textContent = `👤 ${currentUser.name}`;
+}
+function handleLogout() {
+  localStorage.removeItem('agriUser');
+  currentUser = null;
+  cart = [];
+  document.getElementById('cartBadge').textContent = '0';
+  document.getElementById('cartFloat').classList.remove('show');
+  document.getElementById('navUserSection').style.display = 'none';
+  showAuthOverlay();
+  showToast('👋 Logged out. See you soon!');
+}
+
+/* ═══════════════════════════════════════════
+   AUTH GUARD
+═══════════════════════════════════════════ */
+function requireLogin(msg) {
+  if (!currentUser || currentUser.isGuest) {
+    document.getElementById('authReqMsg').textContent = msg || 'Please login to continue.';
+    document.getElementById('authRequired').style.display = 'flex';
+    return false;
+  }
+  return true;
+}
+function closeAuthRequired() {
+  document.getElementById('authRequired').style.display = 'none';
+}
+function sellFormSubmit() {
+  if (!requireLogin('You must be logged in as a Farmer to list produce.')) return;
+  showToast('🌾 Listing submitted! We\'ll review within 24 hrs.');
+}
+function pestSellSubmit() {
+  if (!requireLogin('You must be a verified Pesticide Seller to list products.')) return;
+  showToast('🧪 Product listed! Verification in 24–48 hrs.');
+}
+
+/* ═══════════════════════════════════════════
+   PARTICLES
+═══════════════════════════════════════════ */
+(function(){
+  const c = document.getElementById('particles');
+  const emojis = ['🌿','🍃','🌾','🌱','🍀'];
+  for(let i=0;i<18;i++){
+    const d = document.createElement('div');
+    d.className = 'particle';
+    d.textContent = emojis[i%emojis.length];
+    d.style.cssText = `left:${Math.random()*100}%;font-size:${1+Math.random()*1.5}rem;animation-duration:${10+Math.random()*14}s;animation-delay:${Math.random()*12}s;`;
+    c.appendChild(d);
+  }
+})();
+
+/* ═══════════════════════════════════════════
+   PRODUCT IMAGE SOURCES
+   All images from images.unsplash.com —
+   verified photo IDs showing correct food.
+═══════════════════════════════════════════ */
+const prodImages = {
+  // Tomatoes — bright red ripe tomatoes on vine
+  1:  'https://images.unsplash.com/photo-1607305387299-a3d9611cd469?w=400&h=300&fit=crop&q=85',
+  // Fresh Spinach — vibrant green leafy spinach
+  2:  'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=300&fit=crop&q=85',
+  // Onions — red and white onions market style
+  3:  'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400&h=300&fit=crop&q=85',
+  // Alphonso Mango — golden ripe mangoes
+  4:  'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=400&h=300&fit=crop&q=85',
+  // Pomegranate — red pomegranate cut open
+  5:  'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=400&h=300&fit=crop&q=85',
+  // Banana Bunch — fresh yellow bananas
+  6:  'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&h=300&fit=crop&q=85',
+  // Basmati Rice — white rice grains close-up
+  7:  'https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?w=400&h=300&fit=crop&q=85',
+  // Chana Dal — yellow lentils / chickpea dal
+  8:  'https://images.unsplash.com/photo-1585580407570-3891daff2faa?w=400&h=300&fit=crop&q=85',
+  // Turmeric Powder — yellow spice powder
+  9:  'https://images.unsplash.com/photo-1615485500635-0dadc7c05e73?w=400&h=300&fit=crop&q=85',
+  // Fresh Milk — glass of fresh white milk
+  10: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&h=300&fit=crop&q=85',
+  // Paneer — Indian fresh cheese cubes
+  11: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&h=300&fit=crop&q=85',
+  // Green Chillies — fresh green chilli peppers
+  12: 'https://images.unsplash.com/photo-1606923829579-0cb981a83e2e?w=400&h=300&fit=crop&q=85',
+};
+const pestImages = {
+  // Chlorpyrifos — amber spray bottle
+  101: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=300&fit=crop&q=85',
+  // Mancozeb — agrochemical powder packet
+  102: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400&h=300&fit=crop&q=85',
+  // Glyphosate — herbicide spray in farm field
+  103: 'https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=400&h=300&fit=crop&q=85',
+  // Neem Oil — green natural oil bottle
+  104: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=400&h=300&fit=crop&q=85',
+  // Imidacloprid — blue chemical solution bottle
+  105: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400&h=300&fit=crop&q=85',
+  // Trichoderma — organic green fungal bio agent
+  106: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop&q=85',
+  // Propiconazole — fungicide amber liquid bottle
+  107: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&q=85',
+  // Atrazine — granular herbicide in bag
+  108: 'https://images.unsplash.com/photo-1622547748225-3fc4abd2cca0?w=400&h=300&fit=crop&q=85',
+};
+
+/* ═══════════════════════════════════════════
+   STAR RATING HTML
+═══════════════════════════════════════════ */
+function starsHTML(rating, cls='pstar', wrapCls='pstars') {
+  const n = parseFloat(rating);
+  let s = `<div class="${wrapCls}">`;
+  for(let i=1;i<=5;i++) s += `<span class="${cls}${i<=Math.round(n)?' filled':''}">★</span>`;
+  s += `<span class="prating-txt">${n}</span></div>`;
+  return s;
+}
+
+/* ═══════════════════════════════════════════
+   PRODUCTS DATA
+═══════════════════════════════════════════ */
+const products = [
+  {id:1, name:'Organic Tomatoes',    emoji:'🍅', cat:'vegetables', price:45,  unit:'kg',    farm:'Patil Farm',      dist:12, badge:'organic',   badgeCol:'#2d5020', bg:'#fff5f3', rating:4.6, stock:'In Stock', bestSeller:true},
+  {id:2, name:'Fresh Spinach',       emoji:'🥬', cat:'vegetables', price:30,  unit:'bunch', farm:'Green Valley',    dist:8,  badge:'organic',   badgeCol:'#2d5020', bg:'#f3fff5', rating:4.4, stock:'In Stock', bestSeller:false},
+  {id:3, name:'Sweet Onions',        emoji:'🧅', cat:'vegetables', price:28,  unit:'kg',    farm:'Nashik Direct',   dist:18, badge:'sale',      badgeCol:'#c0392b', bg:'#fff8f3', rating:4.2, stock:'Low Stock',bestSeller:false},
+  {id:4, name:'Alphonso Mangoes',    emoji:'🥭', cat:'fruits',     price:180, unit:'kg',    farm:'Konkan Orchards', dist:28, badge:'seasonal',  badgeCol:'#d4900a', bg:'#fffbf0', rating:4.9, stock:'In Stock', bestSeller:true},
+  {id:5, name:'Pomegranate',         emoji:'🍎', cat:'fruits',     price:120, unit:'kg',    farm:'Solapur Farms',   dist:42, badge:'organic',   badgeCol:'#2d5020', bg:'#fff3f7', rating:4.5, stock:'In Stock', bestSeller:false},
+  {id:6, name:'Banana Bunch',        emoji:'🍌', cat:'fruits',     price:55,  unit:'dozen', farm:'Jalgaon Fruits',  dist:22, badge:'',          badgeCol:'',        bg:'#fffcf0', rating:4.1, stock:'In Stock', bestSeller:false},
+  {id:7, name:'Basmati Rice',        emoji:'🌾', cat:'grains',     price:95,  unit:'kg',    farm:'Sahyadri Farms',  dist:35, badge:'premium',   badgeCol:'#6a3d12', bg:'#fdf8f0', rating:4.7, stock:'In Stock', bestSeller:true},
+  {id:8, name:'Chana Dal',           emoji:'🫘', cat:'grains',     price:85,  unit:'kg',    farm:'Vidarbha Agri',   dist:50, badge:'organic',   badgeCol:'#2d5020', bg:'#f8f5f0', rating:4.3, stock:'In Stock', bestSeller:false},
+  {id:9, name:'Turmeric Powder',     emoji:'🌿', cat:'grains',     price:200, unit:'kg',    farm:'Sangli Spices',   dist:60, badge:'pure',      badgeCol:'#8e44ad', bg:'#fffbf0', rating:4.8, stock:'Low Stock',bestSeller:false},
+  {id:10,name:'Fresh Milk',          emoji:'🥛', cat:'dairy',      price:60,  unit:'litre', farm:'Gavran Dairy',    dist:5,  badge:'fresh',     badgeCol:'#2980b9', bg:'#f0f8ff', rating:4.6, stock:'In Stock', bestSeller:true},
+  {id:11,name:'Paneer',              emoji:'🧀', cat:'dairy',      price:320, unit:'kg',    farm:'Gavran Dairy',    dist:5,  badge:'fresh',     badgeCol:'#2980b9', bg:'#f5fff0', rating:4.5, stock:'In Stock', bestSeller:false},
+  {id:12,name:'Green Chillies',      emoji:'🌶️',  cat:'vegetables', price:40,  unit:'kg',    farm:'Kolhapur Farms',  dist:30, badge:'spicy',     badgeCol:'#c0392b', bg:'#f0fef0', rating:4.0, stock:'In Stock', bestSeller:false},
+];
+let activeProdCat = 'all';
+
+function renderProds(list) {
+  const g = document.getElementById('prodGrid');
+  if (!list.length) { g.innerHTML='<p style="grid-column:1/-1;text-align:center;padding:2rem;color:#666;">No produce found.</p>'; return; }
+  g.innerHTML = list.map(p => {
+    const imgSrc = prodImages[p.id];
+    const stockCls = p.stock === 'In Stock' ? 'in' : 'low';
+    return `<div class="pcard">
+      <div class="pimg" style="background:${p.bg}">
+        ${imgSrc ? `<img src="${imgSrc}" alt="${p.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="pimg-emoji" style="display:none">${p.emoji}</span>` : `<span class="pimg-emoji">${p.emoji}</span>`}
+        ${p.bestSeller ? `<span class="pbadge-bestseller">⭐ Best Seller</span>` : ''}
+        ${p.badge ? `<span class="pbadge" style="background:${p.badgeCol};${p.bestSeller?'top:9px;right:9px;':'top:9px;right:9px;'}">${p.badge}</span>` : ''}
+        <button class="pwishlist${wishlistProds.has(p.id)?' active':''}" onclick="toggleWishProd(${p.id},this)" title="Wishlist">
+          ${wishlistProds.has(p.id)?'❤️':'🤍'}
+        </button>
+        <button class="quickview-btn" onclick="openQV(${p.id},'produce')">👁 Quick View</button>
+      </div>
+      <div class="pinfo">
+        <div class="pname">${p.name}</div>
+        ${starsHTML(p.rating)}
+        <div class="pmeta"><span>🚜 ${p.farm}</span><span>📍 ${p.dist}km</span></div>
+        <div class="pstock ${stockCls}">● ${p.stock}</div>
+        <div class="pfoot">
+          <div class="pprice">₹${p.price} <small>/ ${p.unit}</small></div>
+          <div class="pcard-btns">
+            <button class="abtn" onclick="addCart(${p.id},'produce')">+ Add</button>
+            <button class="buynow-btn" onclick="buyNow(${p.id},'produce')">Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleWishProd(id, btn) {
+  if (wishlistProds.has(id)) { wishlistProds.delete(id); btn.textContent='🤍'; btn.classList.remove('active'); }
+  else { wishlistProds.add(id); btn.textContent='❤️'; btn.classList.add('active'); showToast('❤️ Added to wishlist!'); }
+}
+
+function filterProd(cat, btn) {
+  activeProdCat = cat;
+  document.querySelectorAll('#tabs .tab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderProds(cat==='all' ? products : products.filter(p=>p.cat===cat));
+}
+function searchProd() {
+  const q = document.getElementById('searchProd').value.toLowerCase();
+  renderProds(products.filter(p => (activeProdCat==='all'||p.cat===activeProdCat) && (p.name.toLowerCase().includes(q)||p.farm.toLowerCase().includes(q))));
+}
+function sortProd(v) {
+  let list = activeProdCat==='all' ? [...products] : products.filter(p=>p.cat===activeProdCat);
+  if(v==='low') list.sort((a,b)=>a.price-b.price);
+  else if(v==='high') list.sort((a,b)=>b.price-a.price);
+  else if(v==='near') list.sort((a,b)=>a.dist-b.dist);
+  else if(v==='org') list.sort((a,b)=>(b.badge==='organic')-(a.badge==='organic'));
+  renderProds(list);
+}
+
+/* ═══════════════════════════════════════════
+   PESTICIDES DATA
+═══════════════════════════════════════════ */
+const pesticides = [
+  {id:101,name:'Chlorpyrifos 20% EC',    emoji:'🧪', cat:'insecticide', price:480, unit:'500ml', seller:'AgriChem Pvt.',  rating:'4.2', crop:'Cotton, Paddy',       bg:'#fff5f5'},
+  {id:102,name:'Mancozeb 75% WP',        emoji:'🫧', cat:'fungicide',   price:320, unit:'250g',  seller:'Krishna Agro',   rating:'4.5', crop:'Tomato, Grapes',       bg:'#faf5ff'},
+  {id:103,name:'Glyphosate 41% SL',      emoji:'🌾', cat:'herbicide',   price:260, unit:'1 litre',seller:'Nashik Inputs', rating:'4.0', crop:'All crops',            bg:'#f5fffc'},
+  {id:104,name:'Neem Oil 10000 PPM',     emoji:'🌿', cat:'organic',     price:350, unit:'500ml', seller:'GreenEarth Bio', rating:'4.8', crop:'All crops',            bg:'#f5fff5'},
+  {id:105,name:'Imidacloprid 17.8% SL',  emoji:'🧴', cat:'insecticide', price:540, unit:'250ml', seller:'BayerCrop India',rating:'4.3', crop:'Sugarcane, Wheat',     bg:'#fff5f5'},
+  {id:106,name:'Trichoderma viride',     emoji:'🟢', cat:'organic',     price:180, unit:'1kg',   seller:'BioFarm Pune',   rating:'4.7', crop:'Vegetables, Pulses',   bg:'#f5fff5'},
+  {id:107,name:'Propiconazole 25% EC',   emoji:'🔵', cat:'fungicide',   price:420, unit:'500ml', seller:'Syngenta Agro',  rating:'4.4', crop:'Wheat, Rice',          bg:'#faf5ff'},
+  {id:108,name:'Atrazine 50% WP',        emoji:'🌱', cat:'herbicide',   price:290, unit:'500g',  seller:'Kolhapur Agri',  rating:'3.9', crop:'Maize, Sorghum',       bg:'#f5fffc'},
+];
+let activePestCat = 'all';
+const typeMap = {
+  insecticide:{cls:'type-insecticide',label:'Insecticide'},
+  fungicide:{cls:'type-fungicide',label:'Fungicide'},
+  herbicide:{cls:'type-herbicide',label:'Herbicide'},
+  organic:{cls:'type-organic',label:'Organic'}
+};
+
+function renderPests(list) {
+  const g = document.getElementById('pestGrid');
+  if (!list.length) { g.innerHTML='<p style="grid-column:1/-1;text-align:center;padding:2rem;color:#666;">No products found.</p>'; return; }
+  g.innerHTML = list.map(p => {
+    const t = typeMap[p.cat] || {cls:'',label:p.cat};
+    const imgSrc = pestImages[p.id];
+    return `<div class="pestcard">
+      <div class="pestimg" style="background:${p.bg}">
+        ${imgSrc ? `<img src="${imgSrc}" alt="${p.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="pestimg-emoji" style="display:none">${p.emoji}</span>` : `<span class="pestimg-emoji">${p.emoji}</span>`}
+        <span class="pest-type ${t.cls}">${t.label}</span>
+        <button class="pest-wishlist${wishlistPests.has(p.id)?' active':''}" onclick="toggleWishPest(${p.id},this)">
+          ${wishlistPests.has(p.id)?'❤️':'🤍'}
+        </button>
+      </div>
+      <div class="pestinfo">
+        <div class="pestname">${p.name}</div>
+        ${starsHTML(p.rating, 'pest-star', 'pest-stars')}
+        <div class="pestmeta">🏭 ${p.seller} &nbsp;|&nbsp; 🌾 ${p.crop}</div>
+        <div class="pest-stock">● In Stock</div>
+        <div class="pestfoot">
+          <div class="pestprice">₹${p.price} <small>/ ${p.unit}</small></div>
+          <div class="pest-btns">
+            <button class="abtn" style="background:var(--warn);" onclick="addCart(${p.id},'pesticide')">+ Add</button>
+            <button class="buynow-btn" onclick="buyNow(${p.id},'pesticide')">Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleWishPest(id, btn) {
+  if (wishlistPests.has(id)) { wishlistPests.delete(id); btn.textContent='🤍'; btn.classList.remove('active'); }
+  else { wishlistPests.add(id); btn.textContent='❤️'; btn.classList.add('active'); showToast('❤️ Added to wishlist!'); }
+}
+
+function filterPest(cat, btn) {
+  activePestCat = cat;
+  document.querySelectorAll('#pestTabs .tab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderPests(cat==='all' ? pesticides : pesticides.filter(p=>p.cat===cat));
+}
+function searchPestFn() {
+  const q = document.getElementById('searchPest').value.toLowerCase();
+  renderPests(pesticides.filter(p => (activePestCat==='all'||p.cat===activePestCat) && (p.name.toLowerCase().includes(q)||p.crop.toLowerCase().includes(q)||p.seller.toLowerCase().includes(q))));
+}
+function sortPest(v) {
+  let list = activePestCat==='all' ? [...pesticides] : pesticides.filter(p=>p.cat===activePestCat);
+  if(v==='low') list.sort((a,b)=>a.price-b.price);
+  else if(v==='high') list.sort((a,b)=>b.price-a.price);
+  else if(v==='org') list.sort((a,b)=>(b.cat==='organic')-(a.cat==='organic'));
+  renderPests(list);
+}
+
+/* ═══════════════════════════════════════════
+   QUICK VIEW
+═══════════════════════════════════════════ */
+function openQV(id, type) {
+  const all = type==='produce' ? products : pesticides;
+  const p = all.find(x => x.id===id);
+  if (!p) return;
+  const imgSrc = type==='produce' ? prodImages[id] : pestImages[id];
+  document.getElementById('qvContent').innerHTML = `
+    <div class="qv-img">
+      ${imgSrc ? `<img src="${imgSrc}" alt="${p.name}" loading="lazy">` : `<div style="height:240px;display:flex;align-items:center;justify-content:center;font-size:6rem">${p.emoji}</div>`}
+    </div>
+    <div class="qv-body">
+      <div class="qv-name">${p.name}</div>
+      <div class="qv-meta">${type==='produce' ? `🚜 ${p.farm} &nbsp;|&nbsp; 📍 ${p.dist}km away` : `🏭 ${p.seller} &nbsp;|&nbsp; 🌾 ${p.crop}`}</div>
+      ${starsHTML(p.rating)}
+      <div class="qv-price">₹${p.price} <span style="font-size:1rem;font-weight:400;color:#666">/ ${p.unit}</span></div>
+      <div class="qv-btns">
+        <button class="abtn" style="padding:11px 24px;font-size:.93rem;" onclick="addCart(${p.id},'${type}');closeQV()">+ Add to Cart</button>
+        <button class="buynow-btn" style="padding:11px 24px;font-size:.93rem;" onclick="buyNow(${p.id},'${type}');closeQV()">Buy Now</button>
+      </div>
+    </div>`;
+  document.getElementById('quickViewModal').classList.add('open');
+}
+function closeQV() {
+  document.getElementById('quickViewModal').classList.remove('open');
+}
+document.getElementById('quickViewModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('quickViewModal')) closeQV();
+});
+
+/* ═══════════════════════════════════════════
+   CART
+═══════════════════════════════════════════ */
+let cart = [];
+function addCart(id, type) {
+  if (!requireLogin('Please login to add items to your cart.')) return;
+  const all = [...products, ...pesticides];
+  const p = all.find(x => x.id===id);
+  const ex = cart.find(x => x.id===id);
+  if (ex) ex.qty++;
+  else cart.push({...p, qty:1, type});
+  const total = cart.reduce((s,x)=>s+x.qty,0);
+  document.getElementById('cartBadge').textContent = total;
+  if (total > 0) document.getElementById('cartFloat').classList.add('show');
+  showToast(`${p.emoji} ${p.name} added to cart!`);
+}
+function buyNow(id, type) {
+  if (!requireLogin('Please login to purchase items.')) return;
+  addCart(id, type);
+  showToast('💳 Redirecting to checkout… (coming soon!)','info');
+}
+function viewCart() {
+  if (!cart.length) { showToast('Your cart is empty!'); return; }
+  const lines = cart.map(x=>`${x.emoji} ${x.name} ×${x.qty} — ₹${x.price*x.qty}`).join('\n');
+  const total = cart.reduce((s,x)=>s+x.price*x.qty,0);
+  alert(`🛒 Your Cart:\n\n${lines}\n\n💰 Total: ₹${total}\n\nCheckout coming soon!`);
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type==='error'?' error-toast':type==='info'?' info-toast':'') + ' on';
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), 3200);
+}
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+renderProds(products);
+renderPests(pesticides);
+</script>
+</body>
+</html>
